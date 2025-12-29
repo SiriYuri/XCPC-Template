@@ -1,4 +1,3 @@
-```cpp
 template<typename T>
 constexpr T modpow(T a, ll b) {
   T res {1};
