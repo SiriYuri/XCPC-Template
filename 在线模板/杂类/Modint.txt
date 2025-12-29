@@ -149,4 +149,3 @@ ll MInt<0>::Mod = 998'244'353;
 
 constexpr int P = 998'244'353;
 using mint = MInt<P>;
-```
