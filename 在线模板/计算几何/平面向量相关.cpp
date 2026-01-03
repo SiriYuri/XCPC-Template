@@ -141,7 +141,7 @@ namespace Vector {
     Point<T> mid = (l.a + l.b) / 2; return {mid, mid + _Rotate(l.a, l.b)};
   }
 
-  template<class T> 
+  template<typename T> 
   tuple<int, Point<T>, Point<T>> Segment_Intersection(Line<T> l1, Line<T> l2) {
     auto [s1, e1] = l1; auto [s2, e2] = l2;
     auto A = max(s1.x, e1.x), AA = min(s1.x, e1.x); auto B = max(s1.y, e1.y), BB = min(s1.y, e1.y);
@@ -160,7 +160,7 @@ namespace Vector {
     if (sign(cp1) != 0 && sign(cp2) != 0 && sign(cp3) != 0 && sign(cp4) != 0) {return {1, p, p};} else {return {3, p, p};}
   }
  
-	template <class T>
+  template <typename T>
   bool Segment_Intersect(Line<T> l1, Line<T> l2, bool f = true) {
     auto [s1, e1] = l1; auto [s2, e2] = l2;
     auto A  = max(s1.x, e1.x), AA = min(s1.x, e1.x); auto B  = max(s1.y, e1.y), BB = min(s1.y, e1.y);
