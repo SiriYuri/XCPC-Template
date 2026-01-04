@@ -1,4 +1,5 @@
 // from Jiangly
+```cpp
 constexpr int mod = 998244353;
 
 using Poly = std::vector<int>;
@@ -79,3 +80,4 @@ std::vector<int> mul(std::vector<int> a, std::vector<int> b) {
     a.resize(tot);
     return a;
 }
+```
