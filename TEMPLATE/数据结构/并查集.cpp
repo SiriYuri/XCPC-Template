@@ -1,0 +1,30 @@
+struct DSU {
+    int n;
+    std::vector<int> f, _size;
+
+    DSU(int n) : n(n - 1), f(n), _size(n, 1) {
+        std::iota(f.begin(), f.end(), 0);
+    }
+
+    int find(int x) {
+        return f[x] == x ? x : f[x] = find(f[x]);
+    }
+
+    bool same(int x,int y) {
+        x = find(x),y = find(y);
+        return x == y;
+    }
+
+    void merge(int x, int y) {
+        x = find(x);
+        y = find(y);
+        if (x != y) {
+            f[x] = y;
+            _size[y] += _size[x];
+        }
+    }
+
+    int size(int x) {
+        return _size[x];
+    }
+};
