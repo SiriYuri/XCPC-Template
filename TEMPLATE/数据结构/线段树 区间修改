@@ -1,0 +1,144 @@
+From Jiangly
+```cpp
+template<class Info, class Tag>
+struct LazySegmentTree {
+    int n;                         
+    std::vector<Info> info;
+    std::vector<Tag> tag;
+
+    LazySegmentTree(int len, Info v_ = Info()) {
+        init(len, v_);
+    }
+
+    LazySegmentTree(const std::vector<Info>& a) {
+        init(a);
+    }
+
+    void init(int len, Info v_ = Info()) {
+        std::vector<Info> a(len, v_);
+        init(a);
+    }
+
+    void init(const std::vector<Info>& a) {
+        int len = (int)a.size();
+        n = len - 1;
+        info.assign(4 * n + 5, Info());
+        tag.assign(4 * n + 5, Tag());
+
+        std::function<void(int, int, int)> build = [&](int p, int l, int r) {
+            if (l == r) {
+                info[p] = a[l];
+                return;
+            }
+            int m = (l + r) / 2;
+            build(p * 2, l, m);
+            build(p * 2 + 1, m + 1, r);
+            pull(p);
+        };
+
+        build(1, 1, n);
+    }
+
+    void pull(int p) {
+        info[p] = info[p * 2] + info[p * 2 + 1];
+    }
+
+    void apply(int p, const Tag &v) {
+        info[p].apply(v);
+        tag[p].apply(v);
+    }
+
+    void push(int p) {
+        apply(p * 2, tag[p]);
+        apply(p * 2 + 1, tag[p]);
+        tag[p] = Tag();
+    }
+
+    void modify(int p, int l, int r, int x, const Info &v) {
+        if (l == r) {
+            info[p] = v;
+            tag[p] = Tag();
+            return;
+        }
+        int m = (l + r) / 2;
+        push(p);
+        if (x <= m) {
+            modify(p * 2, l, m, x, v);
+        } else {
+            modify(p * 2 + 1, m + 1, r, x, v);
+        }
+        pull(p);
+    }
+
+    void modify(int x, const Info &v) {
+        modify(1, 1, n, x, v);
+    }
+
+    Info rangequery(int p, int l, int r, int x, int y) {
+        if (r < x || l > y) {
+            return Info();
+        }
+        if (x <= l && r <= y) {
+            return info[p];
+        }
+        int m = (l + r) / 2;
+        push(p);
+        return rangequery(p * 2, l, m, x, y) + rangequery(p * 2 + 1, m + 1, r, x, y);
+    }
+
+    Info rangequery(int l, int r) {
+        if (l > r) {
+            return Info();
+        }
+        return rangequery(1, 1, n, l, r);
+    }
+
+    void rangemodify(int p, int l, int r, int x, int y, const Tag &v) {
+        if (r < x || l > y) {
+            return;
+        }
+        if (x <= l && r <= y) {
+            apply(p, v);
+            return;
+        }
+        int m = (l + r) / 2;
+        push(p);
+        rangemodify(p * 2, l, m, x, y, v);
+        rangemodify(p * 2 + 1, m + 1, r, x, y, v);
+        pull(p);
+    }
+
+    void rangemodify(int l, int r, const Tag &v) {
+        if (l > r) {
+            return;
+        }
+        rangemodify(1, 1, n, l, r, v);
+    }
+};
+
+int inf = std::numeric_limits<int>::max() / 2;
+
+struct Tag {
+    i64 add = 0;
+    void apply(const Tag &t) & { 
+        add += t.add; 
+    }          
+};
+
+struct Info {
+    i64 sum = 0;
+    int mn = inf;
+    int mx = -inf;
+    int len = 0;                                         
+
+    void apply(const Tag &t) & {                             
+        sum += t.add * len;
+        mn += t.add;
+        mx += t.add;
+    }
+};
+
+Info operator + (const Info &a, const Info &b) {
+    return {a.sum + b.sum, std::min(a.mn, b.mn), std::max(a.mx, b.mx), a.len + b.len};
+}
+```
