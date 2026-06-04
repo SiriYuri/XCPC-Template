@@ -1,0 +1,99 @@
+返回虚树的根
+```cpp
+namespace Tree {
+    constexpr int MAXN = 1 << 20, LOG = 20;
+
+    int n, tot;
+    int dep[MAXN], dfn[MAXN], fa[LOG + 1][MAXN];
+    std::vector<int> adj[MAXN], edge[MAXN];
+    std::vector<int> stk, last;
+
+    void init(int _n) {
+        for (int u : last) {
+            edge[u].clear();
+        }
+        last.clear();
+        for (int i = 1; i <= n; i++) {
+            adj[i].clear();
+        }
+        n = _n;
+        tot = 0;
+    }
+
+    void addEdge(int u, int v) {
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
+    }
+
+    void dfs(int p, int father) {
+        dfn[p] = ++tot;
+        dep[p] = dep[father] + 1;
+        fa[0][p] = father;
+        for (int j = 1; j <= LOG; j++) {
+            fa[j][p] = fa[j - 1][fa[j - 1][p]];
+        }
+        for (int c : adj[p]) {
+            if (c != father) {
+                dfs(c, p);
+            }
+        }
+    }
+
+    void work(int root = 1) {
+        tot = 0;
+        dfs(root, root);
+    }
+
+    int lca(int u, int v) {
+        if (dep[u] < dep[v]) std::swap(u, v);
+        for (int d = dep[u] - dep[v], i = 0; d; d >>= 1, i++) {
+            if (d & 1) u = fa[i][u];
+        }
+        if (u == v) return u;
+        for (int i = LOG; i >= 0; i--) {
+            if (fa[i][u] != fa[i][v]) {
+                u = fa[i][u];
+                v = fa[i][v];
+            }
+        }
+        return fa[0][u];
+    }
+
+    int build(std::vector<int>& nodes) {
+        for (int u : last) {
+            edge[u].clear();
+        }
+        std::sort(nodes.begin(), nodes.end(), [&] (auto &x, auto &y) {
+            return dfn[x] < dfn[y];
+        });
+        int siz = nodes.size();
+        for (int i = 0; i < siz - 1; i++) {
+            nodes.emplace_back(lca(nodes[i], nodes[i + 1]));
+        }
+        std::sort(nodes.begin(), nodes.end(), [&] (auto &x, auto &y) {
+            return dfn[x] < dfn[y];
+        });
+        nodes.erase(std::unique(nodes.begin(), nodes.end()), nodes.end());
+        stk.clear();
+        stk.emplace_back(nodes[0]);
+        for (size_t i = 1; i < nodes.size(); i++) {
+            int u = nodes[i];
+            while (stk.size() > 1 && lca(stk.back(), u) != stk.back()) {
+                int v = stk.back();
+                stk.pop_back();
+                edge[stk.back()].emplace_back(v);
+                edge[v].emplace_back(stk.back());
+            }
+            stk.emplace_back(u);
+        }
+        while (stk.size() > 1) {
+            int v = stk.back();
+            stk.pop_back();
+            edge[stk.back()].emplace_back(v);
+            edge[v].emplace_back(stk.back());
+        }
+        last = nodes;
+        return nodes[0];
+    }
+}
+```
