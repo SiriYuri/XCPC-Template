@@ -11,7 +11,7 @@ struct TwoSat {
     
     TwoSat(int n) : n(n), e(2 * n + 2), ans(n + 1) {}
     
-    void add(int u, bool f, int v, bool g) {
+    void add(int u, bool f, int v, bool g) { // 2 * i : False, 2 * i + 1 : True
         e[2 * u + !f].emplace_back(2 * v + g);
         e[2 * v + !g].emplace_back(2 * u + f);
     }
